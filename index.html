@@ -3,200 +3,42 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Librar-Quiz Hub: Demo Kuis & Scorecard</title>
-    <style>
-        body { font-family: 'Arial', sans-serif; margin: 20px; background-color: #f7f7f7; }
-        .container { max-width: 800px; margin: auto; background: white; padding: 30px; border-radius: 10px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
-        h1 { color: #007BFF; border-bottom: 2px solid #007BFF; padding-bottom: 10px; }
-        h3 { margin-top: 25px; color: #333; }
-        #quiz-section { border: 1px dashed #ccc; padding: 20px; margin-top: 20px; border-radius: 5px; }
-        .quiz-option { margin-bottom: 10px; }
-        .scorecard-visualization { margin-top: 30px; padding: 15px; background: #e9ecef; border-radius: 5px; }
-        .chapter-bar-container { display: flex; align-items: center; margin-bottom: 10px; }
-        .chapter-label { width: 120px; font-weight: bold; font-size: 0.9em; }
-        .bar-wrapper { flex-grow: 1; height: 25px; background-color: #ddd; border-radius: 3px; position: relative; }
-        .score-bar { height: 100%; background-color: #28a745; border-radius: 3px; transition: width 0.5s; text-align: right; line-height: 25px; color: white; padding-right: 5px; font-size: 0.8em; }
-        .alert-danger { background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; padding: 10px; margin-top: 15px; border-radius: 5px; }
-        button { background-color: #007BFF; color: white; border: none; padding: 10px 15px; border-radius: 5px; cursor: pointer; transition: background-color 0.3s; }
-        button:hover { background-color: #0056b3; }
-    </style>
+    <title>Chapter Scorecard - Librar-Quiz Hub</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-<div class="container">
-    <h1>📚 Librar-Quiz Hub Demo</h1>
-    <h2>Buku: Logika Berpikir Kritis (Kode QR: LFK01)</h2>
-    <p>Ini adalah halaman detail buku di perpustakaan. Siswa bisa mengaktifkan kuis digital atau melihat performa kelas.</p>
+    <main class="container">
+        <div class="scorecard-wrapper">
+            <header class="scorecard-header">
+                <h2>📊 The Chapter Scorecard</h2>
+                <p>Lihat bab mana yang paling menantang menurut rata-rata kelas.</p>
+            </header>
 
-    <h3>1. Uji Pemahaman: Kuis Bab 3 - Silogisme Dasar</h3>
-    <p>Simulasi pemindaian **Kode QR** dari buku fisik (LFK01-C3).</p>
-    <div id="quiz-section">
-        <div id="quiz-display">
-            <button onclick="startQuiz('LFK01-C3')">Mulai Kuis Bab 3 Sekarang (5 Soal)</button>
-        </div>
-        <div id="quiz-result" style="margin-top: 15px;"></div>
-    </div>
-    
-    <h3>2. Chapter Scorecard: Performansi Kelas</h3>
-    <div class="scorecard-visualization">
-        <p style="font-style: italic;">Rata-rata Akurasi Pengerjaan Kuis oleh Seluruh Siswa:</p>
-        <div id="scorecard-bars">
+            <div class="scorecard-filters">
+                <label for="filter-kelas">Tampilkan data untuk:</label>
+                <select id="filter-kelas" name="filter-kelas">
+                    <option value="X-A">Kelas X-A</option>
+                    <option value="X-B">Kelas X-B</option>
+                    <option value="2025">Angkatan 2025</option>
+                    <option value="all">Semua</option>
+                </select>
             </div>
-        <p class="alert-danger" id="critical-alert" style="display: none;">⚠️ **Peringatan Kritis:** Bab yang ditandai Merah memiliki skor rata-rata di bawah 70%. Fokuskan *Review* Anda di sana!</p>
-    </div>
 
-</div>
-
-<script>
-// ==========================================================
-// JAVASCRIPT LOGIC
-// ==========================================================
-
-// --- SIMULASI DATABASE STATIS ---
-const QUIZ_DATA = {
-    'LFK01-C1': { title: 'Bab 1: Dasar Logika', questions: [ { text: "Semua A adalah B. Semua B adalah C. Maka, semua A adalah C. Ini adalah contoh apa?", options: ["Silogisme", "Induksi", "Aduksi"], answer: "Silogisme" } ] },
-    'LFK01-C2': { title: 'Bab 2: Falasi Informal', questions: [ { text: "Menyerang karakter seseorang daripada argumennya disebut...", options: ["Ad Hominem", "Straw Man", "Red Herring"], answer: "Ad Hominem" } ] },
-    'LFK01-C3': { // Kuis yang kita tampilkan
-        title: 'Bab 3: Silogisme Dasar',
-        questions: [
-            { text: "1. Manakah dari premis berikut yang benar?", options: ["Semua kucing bisa terbang.", "Beberapa mamalia adalah karnivora.", "Semua ikan hidup di darat."], answer: "Beberapa mamalia adalah karnivora." },
-            { text: "2. Argumen dari spesifik ke umum disebut logika...", options: ["Deduktif", "Induktif", "Aduktif"], answer: "Induktif" },
-            { text: "3. 'Jika hari hujan, maka jalanan basah.' Ini adalah contoh...", options: ["Premis Minor", "Hipotesis", "Kausalitas"], answer: "Kausalitas" },
-            { text: "4. Berapa rata-rata skor di bab ini?", options: ["80%", "75%", "70%"], answer: "75%" }, // Soal untuk menguji pemahaman Scorecard
-            { text: "5. Mengapa Thinking Flow Map penting?", options: ["Untuk melihat proses berpikir", "Untuk menyalin jawaban", "Agar tampilan lebih cantik"], answer: "Untuk melihat proses berpikir" }
-        ]
-    }
-};
-
-// --- SIMULASI DATA SKOR DARI LOCAL STORAGE (Untuk Scorecard) ---
-// Data ini mensimulasikan hasil pengerjaan kuis oleh puluhan siswa
-let chapterScores = [
-    { chapter: 'Bab 1', avg_score: 92 },
-    { chapter: 'Bab 2', avg_score: 65 }, // Di bawah 70% -> Kritis (Merah)
-    { chapter: 'Bab 3', avg_score: 78 },
-    { chapter: 'Bab 4', avg_score: 88 },
-    { chapter: 'Bab 5', avg_score: 55 }  // Di bawah 70% -> Kritis (Merah)
-];
-
-// ==========================================================
-// 1. FUNGSI QUIZ
-// ==========================================================
-
-let currentQuizId = '';
-let startTime;
-
-function startQuiz(quizId) {
-    currentQuizId = quizId;
-    const quiz = QUIZ_DATA[quizId];
-    if (!quiz) return;
-
-    startTime = Date.now(); // Mulai timer
-
-    let html = `<h4>${quiz.title} - Waktu Mulai: ${new Date().toLocaleTimeString()}</h4><form id="quiz-form">`;
-    quiz.questions.forEach((q, index) => {
-        html += `<p><strong>${q.text}</strong></p>`;
-        q.options.forEach(option => {
-            html += `<div class="quiz-option">
-                        <input type="radio" name="q${index}" value="${option}" id="q${index}-${option.replace(/\s/g, '-')}" required>
-                        <label for="q${index}-${option.replace(/\s/g, '-')}">${option}</label>
-                     </div>`;
-        });
-    });
-    html += `<button type="submit" style="margin-top: 15px;">Selesai & Cek Skor</button></form>`;
-    
-    document.getElementById('quiz-display').innerHTML = html;
-    
-    document.getElementById('quiz-form').addEventListener('submit', function(e) {
-        e.preventDefault();
-        submitQuiz(quizId, quiz.questions);
-    });
-}
-
-function submitQuiz(quizId, questions) {
-    const endTime = Date.now();
-    const timeTaken = ((endTime - startTime) / 1000).toFixed(2); // Waktu dalam detik
-    
-    let score = 0;
-    questions.forEach((q, index) => {
-        const userAnswer = document.querySelector(`input[name="q${index}"]:checked`)?.value;
-        if (userAnswer === q.answer) {
-            score++;
-        }
-    });
-
-    const finalScore = (score / questions.length) * 100;
-
-    // SIMULASI UPDATE SCORECARD DENGAN DATA BARU
-    const chapterIndex = chapterScores.findIndex(c => c.chapter.includes(quizId.slice(-2))); // Cari bab yang sesuai
-    if (chapterIndex !== -1) {
-        // Simulasi rata-rata baru (mengambil 90% rata-rata lama dan 10% skor baru)
-        chapterScores[chapterIndex].avg_score = ((chapterScores[chapterIndex].avg_score * 0.9) + (finalScore * 0.1)).toFixed(0);
-    }
-
-    const resultHTML = `
-        <h4>✅ Kuis Selesai!</h4>
-        <p>Skor Anda: <strong>${finalScore.toFixed(0)}/${100}</strong> (${score} dari ${questions.length} benar)</p>
-        <p>Waktu Pengerjaan: <strong>${timeTaken} detik</strong></p>
-        <p style="font-style: italic;">(Skor ini telah diperhitungkan ke dalam Chapter Scorecard di bawah.)</p>
-        <button onclick="location.reload()">Kerjakan Lagi</button>
-    `;
-    
-    document.getElementById('quiz-result').innerHTML = resultHTML;
-    document.getElementById('quiz-display').style.display = 'none';
-
-    // Update Scorecard setelah submit
-    renderScorecard();
-}
-
-// ==========================================================
-// 2. FUNGSI SCORECARD
-// ==========================================================
-
-function renderScorecard() {
-    const scorecardContainer = document.getElementById('scorecard-bars');
-    let html = '';
-    let isCritical = false;
-
-    chapterScores.forEach(data => {
-        const score = parseInt(data.avg_score);
-        const color = score < 70 ? '#dc3545' : '#28a745'; // Merah jika < 70
-        
-        if (score < 70) {
-            isCritical = true;
-        }
-
-        html += `
-            <div class="chapter-bar-container">
-                <div class="chapter-label">${data.chapter} (${score}%)</div>
-                <div class="bar-wrapper">
-                    <div class="score-bar" style="width: ${score}%; background-color: ${color};"></div>
+            <div class="chart-area" id="chart-area">
                 </div>
+
+            <div class="scorecard-footer">
+                <div class="legend">
+                    <span class="legend-item critical"></span> Area Kritis (Rata-rata &lt; 70%)
+                </div>
+                <button id="compare-btn" class="compare-button">
+                    Bandingkan dengan Skorku
+                </button>
             </div>
-        `;
-    });
+        </div>
+        </main>
 
-    scorecardContainer.innerHTML = html;
-
-    // Tampilkan Peringatan Kritis jika ada bab di bawah 70%
-    if (isCritical) {
-        document.getElementById('critical-alert').style.display = 'block';
-    } else {
-        document.getElementById('critical-alert').style.display = 'none';
-    }
-}
-
-
-// --- INITALIZATION ---
-document.addEventListener('DOMContentLoaded', () => {
-    // 1. Render Scorecard saat halaman dimuat
-    renderScorecard();
-
-    // 2. Simpan data awal ke LocalStorage jika belum ada (opsional)
-    if (!localStorage.getItem('chapterScores')) {
-        localStorage.setItem('chapterScores', JSON.stringify(chapterScores));
-    }
-});
-
-</script>
+    <script src="script.js"></script>
 </body>
 </html>
