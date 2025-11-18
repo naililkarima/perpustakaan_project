@@ -1,0 +1,207 @@
+/* Import font (opsional, tapi bagus untuk tampilan) */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+
+body {
+    font-family: 'Inter', sans-serif;
+    background-color: #f4f7f6;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+.container {
+    width: 100%;
+    max-width: 800px;
+}
+
+/* Wrapper Utama Scorecard */
+.scorecard-wrapper {
+    background-color: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    padding: 24px;
+    border: 1px solid #e0e0e0;
+}
+
+.scorecard-header {
+    text-align: center;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 16px;
+    margin-bottom: 20px;
+}
+
+.scorecard-header h2 {
+    margin: 0;
+    color: #1a237e; /* Biru tua */
+}
+
+.scorecard-header p {
+    margin: 4px 0 0;
+    font-size: 14px;
+    color: #555;
+}
+
+/* Filter */
+.scorecard-filters {
+    margin-bottom: 24px;
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    font-size: 14px;
+}
+
+.scorecard-filters select {
+    padding: 8px 12px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    background-color: #fff;
+    font-family: 'Inter', sans-serif;
+}
+
+/* Area Grafik */
+.chart-area {
+    display: flex;
+    justify-content: space-around;
+    align-items: flex-end; /* Batang tumbuh dari bawah */
+    height: 250px;
+    border-bottom: 2px solid #e0e0e0;
+    padding: 0 10px 10px 10px;
+    gap: 15px; /* Jarak antar batang */
+}
+
+.chart-bar-wrapper {
+    flex: 1; /* Agar setiap batang punya lebar sama */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    position: relative;
+}
+
+/* Batang utama (wadah) */
+.chart-bar {
+    width: 90%;
+    max-width: 60px;
+    height: 220px; /* Tinggi maks area batang */
+    background-color: #eceff1; /* Latar belakang batang (abu-abu) */
+    border-radius: 6px 6px 0 0;
+    display: flex;
+    flex-direction: column-reverse; /* Mengisi dari bawah */
+    position: relative;
+    overflow: hidden;
+}
+
+/* Isian skor aktual */
+.bar-fill {
+    width: 100%;
+    background-color: #42a5f5; /* Biru */
+    transition: height 0.5s ease-out;
+    display: flex;
+    justify-content: center;
+    align-items: flex-end; /* Tampilkan skor di atas */
+}
+
+/* Label skor di dalam batang */
+.bar-label-score {
+    position: absolute;
+    top: -24px; /* Posisi di atas batang */
+    font-weight: 700;
+    font-size: 15px;
+    color: #333;
+}
+
+/* Batang Kritis (Warna Merah) */
+.bar-fill.critical {
+    background-color: #ef5350; /* Merah */
+}
+
+/* Detail di bawah batang */
+.bar-details {
+    margin-top: 12px;
+}
+
+.chapter-title {
+    font-weight: 600;
+    font-size: 13px;
+    color: #333;
+    display: block;
+}
+
+.avg-time {
+    font-size: 12px;
+    color: #777;
+    display: block;
+}
+
+/* Penanda Kritis */
+.critical-marker {
+    font-size: 11px;
+    font-weight: 700;
+    color: #d32f2f; /* Merah tua */
+    display: block;
+    margin-top: 4px;
+}
+
+/* Footer (Legenda & Tombol) */
+.scorecard-footer {
+    margin-top: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.legend {
+    display: flex;
+    align-items: center;
+    font-size: 13px;
+    color: #555;
+}
+
+.legend-item {
+    width: 14px;
+    height: 14px;
+    border-radius: 3px;
+    margin-right: 8px;
+}
+.legend-item.critical {
+    background-color: #ef5350; /* Merah */
+}
+
+/* Tombol "Compare" */
+.compare-button {
+    background-color: #1a237e;
+    color: white;
+    border: none;
+    padding: 10px 16px;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.compare-button:hover {
+    background-color: #283593;
+}
+
+/* Tampilan Skor Pribadi (awalnya tersembunyi) */
+.user-score-comparison {
+    display: none; /* Sembunyi secara default */
+    position: absolute;
+    bottom: -30px; /* Muncul di bawah detail */
+    background-color: #e3f2fd;
+    border: 1px dashed #42a5f5;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: 600;
+    color: #0d47a1;
+    white-space: nowrap;
+}
+
+.user-score-comparison.visible {
+    display: block; /* Tampilkan saat tombol diklik */
+}
